@@ -6,13 +6,28 @@ import argparse
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Check Git Functionality on a remote server.')
-    parser.add_argument("--git-repository", "-r", dest="git_repo", type=str, required=True, help="Name of Git Repository")
-    parser.add_argument("--debug", action='store_true')
-    args = parser.parse_args()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--action', type=str, choices=['list'])
+   #Can I pass Database instead of full URL?
+    parser.add_argument('--remote-server-url', '-u', dest='url', type=str, required=True,
+                        help="URL that intended to be hit.")
+    parser.add_argument('--critical_threshold', "-c", dest='critical_threshold', type=int, required=False,
+                        help='Critical threshold for service.')
+    parser.add_argument('--debug', action='store_true')
+
+    try:
+        args = parser.parse_args()
+    except SystemExit:
+        sys.exit(4)
+
+    if args.action == 'update':
+        check_git_function(url=args.url)
+    else:
+        print 'Unknown: Check your args?'
+        sys.exit(4)
 
 
-def check_git_function(*args):
+def check_git_function(url):
     git_check, output = commands.getstatusoutput("git ls-remote " + git_repo)
 
     try:

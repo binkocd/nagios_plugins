@@ -3,7 +3,6 @@
 import urllib2
 import sys
 import datetime
-import dateutil.parser as dp
 import xml.etree.ElementTree as et
 import argparse
 
@@ -12,19 +11,19 @@ def check_solr_update(url, critical_threshold):
     root = et.parse(urllib2.urlopen(url)).getroot()
     update_time = root[1][12].text
 
-    update_epoch = int(dp.parse(update_time).strftime('%s'))
-    time_now = int(datetime.datetime.now().strftime("%s"))
+    update_in_epoch = int((datetime.datetime.strptime(update_time, "%Y-%m-%dT%H:%M:%S.%fZ") - datetime.datetime(1970, 1, 1)).total_seconds())
+    time_now = int(datetime.datetime.now().strftime('%s'))
 
-    time_delta = time_now - update_epoch
+    time_delta = time_now - update_in_epoch
 
     if time_delta < critical_threshold:
-        print "Updates are Working OK"
+        print 'OK: Updates are Working. | DELTA_TIME = %s' % time_delta
         sys.exit(0)
     elif time_delta <= critical_threshold:
-        print "Updates are older than %s." % critical_threshold
+        print 'WARN: Updates are older than %s. | DELTA_TIME = %s' % (critical_threshold, time_delta)
         sys.exit(1)
     elif time_delta > critical_threshold:
-        print "UnifiedSearch has not updated in %s seconds" % time_delta
+        print 'CRIT: Database has not updated in %s seconds. | DELTA_TIME = %s' % (time_delta, time_delta)
         sys.exit(2)
 
 
