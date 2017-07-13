@@ -28,7 +28,7 @@ def main():
     elif args.action == 'query':
         solr_query_rate(url=args.url)
     else:
-        print 'Unknown: Check your args?    '
+        print 'Unknown: Check your args?'
         sys.exit(4)
 
 
